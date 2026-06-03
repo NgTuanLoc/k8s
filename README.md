@@ -34,7 +34,7 @@ Each module is one markdown file. Work them **in order**. For every module:
 | 11 | Health probes     | [11-health-probes.md](11-health-probes.md) | ✅ |
 | 12 | Security & RBAC   | [12-security-rbac.md](12-security-rbac.md) | ✅ |
 | 13 | Observability     | [13-observability.md](13-observability.md) | ✅ |
-| 14 | Capstone          | 14-capstone.md | ⬜ |
+| 14 | Capstone          | [14-capstone.md](14-capstone.md) | ✅ |
 
 Legend: ⬜ not started · 🔧 in progress · ✅ done
 

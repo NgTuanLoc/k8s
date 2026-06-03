@@ -1,0 +1,15 @@
+# Non-secret config (Module 6): backend message + the frontend's HTML page.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  BACKEND_MESSAGE: "backend v1 — hello from the API tier"
+  index.html: |
+    <html>
+      <head><title>Capstone</title></head>
+      <body>
+        <h1>🚢 Capstone App</h1>
+        <p>Frontend tier is serving. Backend + Postgres run behind it.</p>
+      </body>
+    </html>

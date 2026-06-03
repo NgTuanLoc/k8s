@@ -1,0 +1,62 @@
+# Backend tier (Deployment + Service + probes + resources + initContainer).
+# The initContainer waits for the DB to accept connections BEFORE the backend
+# starts — real dependency ordering (Module 10/11 ideas applied).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.36
+          # block until db:5432 is reachable
+          command: ["sh", "-c", "until nc -z db 5432; do echo waiting for db; sleep 2; done; echo db is up"]
+      containers:
+        - name: backend
+          image: hashicorp/http-echo
+          args: ["-text=$(BACKEND_MESSAGE)", "-listen=:5678"]
+          env:
+            - name: BACKEND_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BACKEND_MESSAGE
+          ports:
+            - containerPort: 5678
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5678
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5678
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 150m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 80
+      targetPort: 5678

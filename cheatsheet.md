@@ -208,4 +208,16 @@ kubectl get pods -A --field-selector=status.phase=Pending
 
 Built-ins show CURRENT state only (top/events/logs are ephemeral). Production adds Prometheus (metrics history) + Grafana (dashboards) + Loki/ELK (logs).
 
+## Capstone: multi-tier with Kustomize (Module 14)
+
+```bash
+kubectl apply -k DIR/                  # deploy a whole app bundle
+kubectl delete -k DIR/                 # one-command teardown
+kubectl get all,pvc,cm,secret,hpa -n NS
+kubectl wait --for=condition=ready pod --all -n NS --timeout=180s
+kubectl port-forward -n NS svc/frontend 8080:80
+```
+
+Combine: Namespace + Secret + ConfigMap + StatefulSet(DB) + Deployments + Services + probes + HPA. initContainer (`nc -z db 5432`) enforces start ordering.
+
 <!-- More sections appended as modules are completed. -->
