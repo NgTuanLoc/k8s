@@ -1,0 +1,14 @@
+# A single Pod, declared the *declarative* way (kubectl apply -f this file).
+# Contrast with the imperative `kubectl run` from Module 0.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mental-model
+  labels:
+    app: mental-model
+spec:
+  containers:
+    - name: web
+      image: nginx          # desired state: run nginx
+      ports:
+        - containerPort: 80

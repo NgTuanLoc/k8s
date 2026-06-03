@@ -27,4 +27,21 @@ kubectl get pods                               # list pods
 kubectl delete pod NAME                         # delete a pod
 ```
 
+## Mental model: spec vs status (Module 1)
+
+```bash
+kubectl apply -f file.yaml        # declarative: create OR update to desired state
+kubectl delete -f file.yaml       # remove what the file declares
+
+kubectl get pod NAME -o yaml      # full object: see spec: (desired) and status: (actual)
+kubectl get pod NAME -o jsonpath='{.spec.containers[0].image}{"\n"}'   # desired image
+kubectl get pod NAME -o jsonpath='{.status.phase}{"\n"}'               # actual phase
+
+kubectl api-resources             # every kind you can create (+ short names)
+kubectl explain pod               # docs for a kind
+kubectl explain pod.spec.containers   # drill into any field
+```
+
+Reconcile loop = controller runs forever: observe → compare spec vs status → act.
+
 <!-- More sections appended as modules are completed. -->
