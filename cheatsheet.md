@@ -44,4 +44,20 @@ kubectl explain pod.spec.containers   # drill into any field
 
 Reconcile loop = controller runs forever: observe → compare spec vs status → act.
 
+## Pods: logs & exec (Module 2)
+
+```bash
+kubectl get pod NAME -o wide          # + Pod IP and node
+kubectl describe pod NAME             # events, container states, why it's stuck
+
+kubectl logs NAME                     # single-container pod
+kubectl logs NAME -c CONTAINER        # pick a container (multi-container pod)
+kubectl logs NAME --previous          # logs from the crashed previous instance
+
+kubectl exec -it NAME -- sh                  # shell into first container
+kubectl exec NAME -c CONTAINER -- cat /path  # run in a specific container
+```
+
+Pod = smallest unit; 1+ containers sharing one IP (`localhost`) + volumes (sidecar pattern).
+
 <!-- More sections appended as modules are completed. -->

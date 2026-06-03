@@ -22,7 +22,7 @@ Each module is one markdown file. Work them **in order**. For every module:
 |---|--------|------|--------|
 | 0  | Setup             | [00-setup.md](00-setup.md) | ✅ |
 | 1  | Mental model      | [01-mental-model.md](01-mental-model.md) | ✅ |
-| 2  | Pods              | 02-pods.md | ⬜ |
+| 2  | Pods              | [02-pods.md](02-pods.md) | ✅ |
 | 3  | Deployments       | 03-deployments.md | ⬜ |
 | 4  | Deploy strategies | 04-deploy-strategies.md | ⬜ |
 | 5  | Services          | 05-services.md | ⬜ |
