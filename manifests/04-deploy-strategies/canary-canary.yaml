@@ -1,0 +1,25 @@
+# Canary demo, part 2: the CANARY version (1 replica).
+# Same app=canary label -> the shared Service sends it ~1 of every 4 requests.
+# Scale this up / stable down to shift more traffic to the new version.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: canary
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: canary
+        track: canary
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo
+          args: ["-text=CANARY v2", "-listen=:5678"]
+          ports:
+            - containerPort: 5678

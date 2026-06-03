@@ -1,0 +1,24 @@
+# Blue version. http-echo replies with a fixed string so we can SEE which
+# version a request hit. Labels: app=bluegreen, version=blue.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bluegreen
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: bluegreen
+        version: blue
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo
+          args: ["-text=I am BLUE", "-listen=:5678"]
+          ports:
+            - containerPort: 5678

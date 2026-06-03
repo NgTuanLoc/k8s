@@ -1,0 +1,23 @@
+# Green version. Same app, different version label and reply string.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bluegreen
+      version: green
+  template:
+    metadata:
+      labels:
+        app: bluegreen
+        version: green
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo
+          args: ["-text=I am GREEN", "-listen=:5678"]
+          ports:
+            - containerPort: 5678

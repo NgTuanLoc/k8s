@@ -1,0 +1,23 @@
+# Recreate: kill ALL old pods, THEN start new ones. Causes downtime,
+# but guarantees only one version runs at a time.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recreate
+spec:
+  replicas: 4
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: recreate
+  template:
+    metadata:
+      labels:
+        app: recreate
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80

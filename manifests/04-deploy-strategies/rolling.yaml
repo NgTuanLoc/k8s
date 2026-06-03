@@ -1,0 +1,27 @@
+# RollingUpdate: replace pods gradually, zero downtime.
+# maxSurge=1     -> may run 1 EXTRA pod above replicas during the roll
+# maxUnavailable=0 -> never drop below replicas (always keep all serving)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rolling
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: rolling
+  template:
+    metadata:
+      labels:
+        app: rolling
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80

@@ -76,4 +76,23 @@ kubectl rollout restart deploy/web              # recreate all pods
 
 Deployment → ReplicaSet → Pods. The ReplicaSet self-heals; `selector` must match `template.labels`.
 
+## Deploy strategies (Module 4)
+
+```bash
+# strategy.type: RollingUpdate (default) | Recreate
+# rollingUpdate.maxSurge (extra pods) / maxUnavailable (missing pods)
+kubectl get pods -l app=NAME -w               # watch pods cycle during a roll
+
+# blue-green: flip the Service selector (instant, atomic)
+kubectl patch svc bluegreen -p '{"spec":{"selector":{"app":"bluegreen","version":"green"}}}'
+
+# canary: split traffic by replica ratio behind one shared Service
+kubectl scale deploy/canary-canary --replicas=3   # promote
+kubectl scale deploy/canary-stable --replicas=0
+
+kubectl run tmp --image=curlimages/curl --restart=Never -i --rm -- -s http://SVC   # test from inside
+```
+
+Recreate = downtime; RollingUpdate = zero-downtime. Safe rolls need readiness probes (Module 11).
+
 <!-- More sections appended as modules are completed. -->

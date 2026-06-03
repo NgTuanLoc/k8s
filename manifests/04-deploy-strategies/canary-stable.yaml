@@ -1,0 +1,37 @@
+# Canary demo, part 1: the STABLE version (3 replicas).
+# Both stable and canary share label app=canary, so ONE Service spans both.
+# Traffic split is just the replica ratio: 3 stable : 1 canary  (~75/25).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-stable
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: canary
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: canary
+        track: stable
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo
+          args: ["-text=STABLE v1", "-listen=:5678"]
+          ports:
+            - containerPort: 5678
+---
+# The Service spans BOTH tracks (selects only app=canary).
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary
+spec:
+  selector:
+    app: canary          # note: no track -> matches stable AND canary pods
+  ports:
+    - port: 80
+      targetPort: 5678
