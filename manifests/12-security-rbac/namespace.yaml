@@ -1,0 +1,5 @@
+# An isolated namespace for this lab.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rbac-lab

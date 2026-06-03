@@ -183,4 +183,18 @@ livenessProbe:  { httpGet: {path: /, port: 80}, periodSeconds: 5, failureThresho
 
 liveness = restart wedged container; readiness = gate traffic (Endpoints); startup = protect slow boot. Don't put dependency checks in liveness.
 
+## Security & RBAC (Module 12)
+
+```bash
+kubectl get ns
+kubectl config set-context --current --namespace=NS    # change default ns
+kubectl get sa,role,rolebinding -n NS
+kubectl auth can-i VERB RESOURCE -n NS                  # as you
+kubectl auth can-i delete pods --as=system:serviceaccount:NS:SA -n NS
+kubectl auth can-i --list --as=system:serviceaccount:NS:SA -n NS
+kubectl create role NAME --verb=get,list --resource=pods -n NS --dry-run=client -o yaml
+```
+
+Role (namespaced) + RoleBinding → subject. ClusterRole/Binding = cluster-wide. Least privilege; every pod runs as a ServiceAccount.
+
 <!-- More sections appended as modules are completed. -->

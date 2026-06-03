@@ -1,0 +1,11 @@
+# A Role = a set of allowed verbs on resources, WITHIN one namespace.
+# This one allows only reading pods (get/list/watch) in rbac-lab.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: rbac-lab
+rules:
+  - apiGroups: [""]            # "" = the core API group (pods live here)
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
