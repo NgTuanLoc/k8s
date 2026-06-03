@@ -1,0 +1,23 @@
+# A Deployment: declares "keep 3 nginx Pods running" and self-heals.
+# Deployment -> creates a ReplicaSet -> which creates/keeps the Pods.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 3                # desired number of Pods
+  selector:
+    matchLabels:
+      app: web               # which Pods this Deployment owns...
+  template:                  # ...the Pod blueprint it stamps out
+    metadata:
+      labels:
+        app: web             # MUST match selector.matchLabels above
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25  # pinned tag so we can roll to 1.26 later
+          ports:
+            - containerPort: 80

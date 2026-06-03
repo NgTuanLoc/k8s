@@ -60,4 +60,20 @@ kubectl exec NAME -c CONTAINER -- cat /path  # run in a specific container
 
 Pod = smallest unit; 1+ containers sharing one IP (`localhost`) + volumes (sidecar pattern).
 
+## Deployments: scale, rollout, rollback (Module 3)
+
+```bash
+kubectl get deploy,rs,pods -l app=web     # see all three layers
+kubectl scale deploy/web --replicas=5     # scale
+
+kubectl set image deploy/web nginx=nginx:1.26   # roll out new image
+kubectl rollout status deploy/web               # watch (blocks till done/fails)
+kubectl rollout history deploy/web              # list revisions
+kubectl rollout undo deploy/web                 # roll back to previous
+kubectl rollout undo deploy/web --to-revision=1 # roll back to specific
+kubectl rollout restart deploy/web              # recreate all pods
+```
+
+Deployment → ReplicaSet → Pods. The ReplicaSet self-heals; `selector` must match `template.labels`.
+
 <!-- More sections appended as modules are completed. -->
