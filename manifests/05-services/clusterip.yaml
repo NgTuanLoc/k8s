@@ -1,0 +1,13 @@
+# ClusterIP (the default type): a stable in-cluster VIP + DNS name "web".
+# Routes to any Pod matching the selector. Reachable only from inside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: ClusterIP
+  selector:
+    app: web            # picks up the Deployment's pods
+  ports:
+    - port: 80          # the Service's port
+      targetPort: 80    # the container's port

@@ -95,4 +95,28 @@ kubectl run tmp --image=curlimages/curl --restart=Never -i --rm -- -s http://SVC
 
 Recreate = downtime; RollingUpdate = zero-downtime. Safe rolls need readiness probes (Module 11).
 
+## Services & DNS (Module 5)
+
+```bash
+kubectl get svc                       # types, cluster IPs, ports
+kubectl get endpoints SVC             # live pod IPs behind a Service (#1 debug)
+kubectl expose deploy/web --port=80 --target-port=80   # quick ClusterIP
+kubectl port-forward svc/web 8080:80  # reach any Service from your laptop
+# DNS: web | web.<ns> | web.<ns>.svc.cluster.local
+```
+
+Types: ClusterIP (in-cluster) · NodePort (node port) · LoadBalancer (cloud). Empty endpoints = selector/label mismatch.
+
+## Config: ConfigMaps & Secrets (Module 6)
+
+```bash
+kubectl create configmap NAME --from-literal=K=V --from-file=app.conf
+kubectl create secret generic NAME --from-literal=API_KEY=s3cr3t
+kubectl get cm,secret ; kubectl describe cm NAME
+kubectl get secret NAME -o jsonpath='{.data.KEY}' | base64 -d   # decode
+kubectl rollout restart deploy/NAME   # REQUIRED for env CM/Secret changes to apply
+```
+
+Inject as env (`valueFrom`/`envFrom`, cached at start) or as files (volume mount, updates live). Secrets are base64, not encrypted.
+
 <!-- More sections appended as modules are completed. -->

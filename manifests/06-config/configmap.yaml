@@ -1,0 +1,15 @@
+# Non-secret config. Two flavours of data:
+#  - simple key=value pairs (good for env vars)
+#  - a whole file (good for mounting as a config file)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_COLOR: "blue"
+  APP_MODE: "production"
+  app.conf: |
+    # app config file (mounted as a file)
+    color = blue
+    mode  = production
+    retries = 3

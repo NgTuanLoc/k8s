@@ -1,0 +1,30 @@
+# Consume config as FILES by mounting the ConfigMap as a volume.
+# Each selected key becomes a file under the mountPath.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-vol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-vol
+  template:
+    metadata:
+      labels:
+        app: app-vol
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: app-config
+            items:
+              - key: app.conf      # project only this key...
+                path: app.conf     # ...as this filename
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "sleep 3600"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/app  # -> /etc/app/app.conf

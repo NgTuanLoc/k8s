@@ -1,0 +1,14 @@
+# NodePort: same routing as ClusterIP, PLUS opens a port on every node
+# (range 30000-32767) so you can reach the app from outside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080   # optional fixed node port (else auto-assigned)
