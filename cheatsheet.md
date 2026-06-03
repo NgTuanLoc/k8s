@@ -172,4 +172,15 @@ kubectl debug -it NAME --image=busybox --target=CONT   # no shell in image
 
 Pending = scheduling (describe). CrashLoopBackOff = app (logs). ImagePullBackOff = image/registry (describe).
 
+## Health probes (Module 11)
+
+```yaml
+startupProbe:   { httpGet: {path: /, port: 80}, failureThreshold: 30, periodSeconds: 2 }
+readinessProbe: { httpGet: {path: /, port: 80}, periodSeconds: 5, failureThreshold: 2 }
+livenessProbe:  { httpGet: {path: /, port: 80}, periodSeconds: 5, failureThreshold: 3 }
+# mechanisms: httpGet (2xx/3xx ok) | tcpSocket {port} | exec {command}
+```
+
+liveness = restart wedged container; readiness = gate traffic (Endpoints); startup = protect slow boot. Don't put dependency checks in liveness.
+
 <!-- More sections appended as modules are completed. -->

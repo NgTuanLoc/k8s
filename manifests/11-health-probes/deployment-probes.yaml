@@ -1,0 +1,41 @@
+# nginx with all three probe types.
+#  startupProbe   -> protects a slow boot; until it passes, liveness/readiness are paused
+#  readinessProbe -> gates traffic: pod only joins Service Endpoints when it passes
+#  livenessProbe  -> restarts the container if it goes unhealthy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          startupProbe:
+            httpGet:
+              path: /
+              port: 80
+            failureThreshold: 30      # up to 30*2s = 60s to start
+            periodSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2       # 2 fails -> removed from Endpoints
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 3       # 3 fails -> container restarted
