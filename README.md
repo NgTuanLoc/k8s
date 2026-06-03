@@ -29,7 +29,7 @@ Each module is one markdown file. Work them **in order**. For every module:
 | 6  | Config            | [06-config.md](06-config.md) | ✅ |
 | 7  | Storage           | [07-storage.md](07-storage.md) | ✅ |
 | 8  | Jobs & CronJobs   | [08-jobs-cronjobs.md](08-jobs-cronjobs.md) | ✅ |
-| 9  | Scaling           | 09-scaling.md | ⬜ |
+| 9  | Scaling           | [09-scaling.md](09-scaling.md) | ✅ |
 | 10 | Debugging         | 10-debugging.md | ⬜ |
 | 11 | Health probes     | 11-health-probes.md | ⬜ |
 | 12 | Security & RBAC   | 12-security-rbac.md | ⬜ |

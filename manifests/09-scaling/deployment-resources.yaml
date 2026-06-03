@@ -1,0 +1,39 @@
+# A CPU-burnable app (php-apache; the classic HPA demo image).
+# requests.cpu -> what the scheduler reserves AND what the HPA measures % against.
+# limits.cpu   -> hard cap; the container is throttled above it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      containers:
+        - name: php-apache
+          image: registry.k8s.io/hpa-example
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m          # 0.1 core reserved (HPA measures against this)
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+spec:
+  selector:
+    app: php-apache
+  ports:
+    - port: 80

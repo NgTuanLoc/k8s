@@ -144,4 +144,19 @@ kubectl patch cronjob NAME -p '{"spec":{"suspend":true}}'   # pause
 
 Job = run-to-completion (restartPolicy Never/OnFailure). backoffLimit=retries, ttlSecondsAfterFinished=auto-clean. CronJob = scheduled Job; concurrencyPolicy Forbid/Replace avoids overlap.
 
+## Scaling: requests/limits & HPA (Module 9)
+
+```bash
+# metrics-server (kind needs the insecure-tls patch):
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch -n kube-system deploy metrics-server --type=json \
+  -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+
+kubectl top nodes ; kubectl top pods
+kubectl autoscale deploy/NAME --cpu-percent=50 --min=1 --max=5
+kubectl get hpa            # TARGETS = current%/target%
+```
+
+requests = scheduler reserves + HPA baseline; limits = hard cap (CPU throttle, mem OOMKill). HPA needs metrics-server + CPU requests.
+
 <!-- More sections appended as modules are completed. -->
