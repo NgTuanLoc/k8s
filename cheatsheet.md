@@ -132,4 +132,16 @@ kubectl delete pvc www-web-0 www-web-1   # STS leaves PVCs behind on delete
 
 PVC (request) → StorageClass provisions → PV (disk). Data on a PVC survives pod deletion. STS = stable names + PVC per pod.
 
+## Jobs & CronJobs (Module 8)
+
+```bash
+kubectl get jobs                          # COMPLETIONS (e.g. 1/1)
+kubectl logs job/NAME
+kubectl get cronjobs                      # SCHEDULE, LAST SCHEDULE
+kubectl create job --from=cronjob/NAME manual-run   # trigger now
+kubectl patch cronjob NAME -p '{"spec":{"suspend":true}}'   # pause
+```
+
+Job = run-to-completion (restartPolicy Never/OnFailure). backoffLimit=retries, ttlSecondsAfterFinished=auto-clean. CronJob = scheduled Job; concurrencyPolicy Forbid/Replace avoids overlap.
+
 <!-- More sections appended as modules are completed. -->
