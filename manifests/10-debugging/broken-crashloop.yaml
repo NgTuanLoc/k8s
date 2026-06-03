@@ -1,0 +1,13 @@
+# BROKEN ON PURPOSE: the container prints an error and exits 1 immediately.
+# Symptom: CrashLoopBackOff (k8s keeps restarting it with growing back-off).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-crashloop
+  labels:
+    lab: debugging
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "echo 'FATAL: cannot connect to db'; sleep 5; exit 1"]

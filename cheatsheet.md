@@ -159,4 +159,17 @@ kubectl get hpa            # TARGETS = current%/target%
 
 requests = scheduler reserves + HPA baseline; limits = hard cap (CPU throttle, mem OOMKill). HPA needs metrics-server + CPU requests.
 
+## Debugging loop (Module 10)
+
+```bash
+kubectl get pods [-o wide]                  # 1. state
+kubectl describe pod NAME                    # 2. EVENTS (the 'why')
+kubectl logs NAME [--previous] [-c CONT]     # 3. app output (crashed = --previous)
+kubectl get events --sort-by=.lastTimestamp  # 4. cluster timeline
+kubectl exec -it NAME -- sh                   # 5. inside a running container
+kubectl debug -it NAME --image=busybox --target=CONT   # no shell in image
+```
+
+Pending = scheduling (describe). CrashLoopBackOff = app (logs). ImagePullBackOff = image/registry (describe).
+
 <!-- More sections appended as modules are completed. -->

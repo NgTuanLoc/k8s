@@ -1,0 +1,12 @@
+# BROKEN ON PURPOSE: the image tag does not exist.
+# Symptom: pod stuck in ErrImagePull / ImagePullBackOff.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-image
+  labels:
+    lab: debugging
+spec:
+  containers:
+    - name: app
+      image: nginx:thistagdoesnotexist

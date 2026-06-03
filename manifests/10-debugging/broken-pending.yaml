@@ -1,0 +1,15 @@
+# BROKEN ON PURPOSE: requests more CPU than any node has.
+# Symptom: pod stuck Pending; describe shows FailedScheduling / Insufficient cpu.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-pending
+  labels:
+    lab: debugging
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        requests:
+          cpu: "1000"        # 1000 cores — no node can satisfy this
