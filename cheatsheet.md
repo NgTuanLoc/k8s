@@ -197,4 +197,15 @@ kubectl create role NAME --verb=get,list --resource=pods -n NS --dry-run=client 
 
 Role (namespaced) + RoleBinding → subject. ClusterRole/Binding = cluster-wide. Least privilege; every pod runs as a ServiceAccount.
 
+## Observability (Module 13)
+
+```bash
+kubectl top nodes ; kubectl top pods [-A] [--sort-by=cpu]
+kubectl get events --sort-by=.lastTimestamp [-A]
+kubectl describe node NODE | grep -A8 "Allocated resources"
+kubectl get pods -A --field-selector=status.phase=Pending
+```
+
+Built-ins show CURRENT state only (top/events/logs are ephemeral). Production adds Prometheus (metrics history) + Grafana (dashboards) + Loki/ELK (logs).
+
 <!-- More sections appended as modules are completed. -->
