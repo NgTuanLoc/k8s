@@ -1,0 +1,13 @@
+# A PersistentVolumeClaim: a REQUEST for storage. On kind, the default
+# StorageClass "standard" dynamically provisions a matching PV automatically.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce        # mountable read-write by a single node
+  resources:
+    requests:
+      storage: 100Mi
+  # storageClassName omitted -> uses the cluster's default StorageClass

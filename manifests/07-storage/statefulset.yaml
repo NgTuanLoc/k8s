@@ -1,0 +1,48 @@
+# A StatefulSet: stable identity + a PVC PER pod.
+# Pods get ordered, stable names (web-0, web-1) and each gets its OWN volume
+# from the volumeClaimTemplate (www-web-0, www-web-1).
+# StatefulSets require a headless Service (clusterIP: None) for stable DNS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: web-sts
+spec:
+  clusterIP: None          # headless: gives each pod its own DNS record
+  selector:
+    app: web-sts
+  ports:
+    - port: 80
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  serviceName: web         # must reference the headless Service above
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-sts
+  template:
+    metadata:
+      labels:
+        app: web-sts
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:    # each pod gets its OWN PVC stamped from this
+    - metadata:
+        name: www
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Mi

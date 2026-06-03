@@ -119,4 +119,17 @@ kubectl rollout restart deploy/NAME   # REQUIRED for env CM/Secret changes to ap
 
 Inject as env (`valueFrom`/`envFrom`, cached at start) or as files (volume mount, updates live). Secrets are base64, not encrypted.
 
+## Storage: PVC/PV, StatefulSets (Module 7)
+
+```bash
+kubectl get storageclass            # provisioners (kind: 'standard' default)
+kubectl get pvc                     # claims (want STATUS=Bound)
+kubectl get pv                      # the actual volumes
+kubectl describe pvc NAME           # why Pending
+kubectl get statefulset ; kubectl get pods -l app=web-sts   # web-0, web-1
+kubectl delete pvc www-web-0 www-web-1   # STS leaves PVCs behind on delete
+```
+
+PVC (request) → StorageClass provisions → PV (disk). Data on a PVC survives pod deletion. STS = stable names + PVC per pod.
+
 <!-- More sections appended as modules are completed. -->
