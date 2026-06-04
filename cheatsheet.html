@@ -356,6 +356,15 @@ kubectl port-forward -n NS svc/frontend 8080:80</code></pre>
       copyText(code.innerText, btn);
     });
   });
+
+  // Task 4: Expand-all / Collapse-all
+  const allDetails = () => document.querySelectorAll("#modules details");
+  document.getElementById("expand-all").addEventListener("click", () => {
+    allDetails().forEach(d => { d.open = true; });
+  });
+  document.getElementById("collapse-all").addEventListener("click", () => {
+    allDetails().forEach(d => { d.open = false; });
+  });
 </script>
 </body>
 </html>
