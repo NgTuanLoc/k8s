@@ -86,7 +86,245 @@
   <button id="theme-toggle" type="button" aria-label="Toggle dark/light theme">🌙</button>
 </header>
 <main id="modules">
-  <!-- Module cards inserted in Task 2 -->
+  <details open>
+    <summary>Contexts &amp; clusters (Module 0)</summary>
+    <p class="concept">Switch between clusters and inspect node/pod state.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl config get-contexts        # list reachable clusters
+kubectl config current-context     # active cluster
+kubectl config use-context NAME    # switch active cluster
+kubectl cluster-info               # control-plane URL
+kubectl get nodes                  # nodes (want STATUS=Ready)
+kubectl get pods -A                # pods in ALL namespaces</code></pre>
+    </div>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kind create cluster --name k8s-course   # create kind cluster
+kind delete cluster --name k8s-course   # delete it
+minikube start / minikube stop          # minikube lifecycle</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Pods (Module 0 intro)</summary>
+    <p class="concept">Smallest unit you can run directly.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl run NAME --image=IMG --restart=Never   # create a bare pod
+kubectl get pods                               # list pods
+kubectl delete pod NAME                         # delete a pod</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Mental model: spec vs status (Module 1)</summary>
+    <p class="concept">Reconcile loop = controller runs forever: observe → compare spec vs status → act.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl apply -f file.yaml        # declarative: create OR update to desired state
+kubectl delete -f file.yaml       # remove what the file declares
+
+kubectl get pod NAME -o yaml      # full object: see spec: (desired) and status: (actual)
+kubectl get pod NAME -o jsonpath='{.spec.containers[0].image}{"\n"}'   # desired image
+kubectl get pod NAME -o jsonpath='{.status.phase}{"\n"}'               # actual phase
+
+kubectl api-resources             # every kind you can create (+ short names)
+kubectl explain pod               # docs for a kind
+kubectl explain pod.spec.containers   # drill into any field</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Pods: logs &amp; exec (Module 2)</summary>
+    <p class="concept">Pod = smallest unit; 1+ containers sharing one IP (`localhost`) + volumes (sidecar pattern).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get pod NAME -o wide          # + Pod IP and node
+kubectl describe pod NAME             # events, container states, why it's stuck
+
+kubectl logs NAME                     # single-container pod
+kubectl logs NAME -c CONTAINER        # pick a container (multi-container pod)
+kubectl logs NAME --previous          # logs from the crashed previous instance
+
+kubectl exec -it NAME -- sh                  # shell into first container
+kubectl exec NAME -c CONTAINER -- cat /path  # run in a specific container</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Deployments: scale, rollout, rollback (Module 3)</summary>
+    <p class="concept">Deployment → ReplicaSet → Pods. The ReplicaSet self-heals; `selector` must match `template.labels`.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get deploy,rs,pods -l app=web     # see all three layers
+kubectl scale deploy/web --replicas=5     # scale
+
+kubectl set image deploy/web nginx=nginx:1.26   # roll out new image
+kubectl rollout status deploy/web               # watch (blocks till done/fails)
+kubectl rollout history deploy/web              # list revisions
+kubectl rollout undo deploy/web                 # roll back to previous
+kubectl rollout undo deploy/web --to-revision=1 # roll back to specific
+kubectl rollout restart deploy/web              # recreate all pods</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Deploy strategies (Module 4)</summary>
+    <p class="concept">Recreate = downtime; RollingUpdate = zero-downtime. Safe rolls need readiness probes (Module 11).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code># strategy.type: RollingUpdate (default) | Recreate
+# rollingUpdate.maxSurge (extra pods) / maxUnavailable (missing pods)
+kubectl get pods -l app=NAME -w               # watch pods cycle during a roll
+
+# blue-green: flip the Service selector (instant, atomic)
+kubectl patch svc bluegreen -p '{"spec":{"selector":{"app":"bluegreen","version":"green"}}}'
+
+# canary: split traffic by replica ratio behind one shared Service
+kubectl scale deploy/canary-canary --replicas=3   # promote
+kubectl scale deploy/canary-stable --replicas=0
+
+kubectl run tmp --image=curlimages/curl --restart=Never -i --rm -- -s http://SVC   # test from inside</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Services &amp; DNS (Module 5)</summary>
+    <p class="concept">Types: ClusterIP (in-cluster) · NodePort (node port) · LoadBalancer (cloud). Empty endpoints = selector/label mismatch.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get svc                       # types, cluster IPs, ports
+kubectl get endpoints SVC             # live pod IPs behind a Service (#1 debug)
+kubectl expose deploy/web --port=80 --target-port=80   # quick ClusterIP
+kubectl port-forward svc/web 8080:80  # reach any Service from your laptop
+# DNS: web | web.&lt;ns&gt; | web.&lt;ns&gt;.svc.cluster.local</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Config: ConfigMaps &amp; Secrets (Module 6)</summary>
+    <p class="concept">Inject as env (`valueFrom`/`envFrom`, cached at start) or as files (volume mount, updates live). Secrets are base64, not encrypted.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl create configmap NAME --from-literal=K=V --from-file=app.conf
+kubectl create secret generic NAME --from-literal=API_KEY=s3cr3t
+kubectl get cm,secret ; kubectl describe cm NAME
+kubectl get secret NAME -o jsonpath='{.data.KEY}' | base64 -d   # decode
+kubectl rollout restart deploy/NAME   # REQUIRED for env CM/Secret changes to apply</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Storage: PVC/PV, StatefulSets (Module 7)</summary>
+    <p class="concept">PVC (request) → StorageClass provisions → PV (disk). Data on a PVC survives pod deletion. STS = stable names + PVC per pod.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get storageclass            # provisioners (kind: 'standard' default)
+kubectl get pvc                     # claims (want STATUS=Bound)
+kubectl get pv                      # the actual volumes
+kubectl describe pvc NAME           # why Pending
+kubectl get statefulset ; kubectl get pods -l app=web-sts   # web-0, web-1
+kubectl delete pvc www-web-0 www-web-1   # STS leaves PVCs behind on delete</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Jobs &amp; CronJobs (Module 8)</summary>
+    <p class="concept">Job = run-to-completion (restartPolicy Never/OnFailure). backoffLimit=retries, ttlSecondsAfterFinished=auto-clean. CronJob = scheduled Job; concurrencyPolicy Forbid/Replace avoids overlap.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get jobs                          # COMPLETIONS (e.g. 1/1)
+kubectl logs job/NAME
+kubectl get cronjobs                      # SCHEDULE, LAST SCHEDULE
+kubectl create job --from=cronjob/NAME manual-run   # trigger now
+kubectl patch cronjob NAME -p '{"spec":{"suspend":true}}'   # pause</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Scaling: requests/limits &amp; HPA (Module 9)</summary>
+    <p class="concept">requests = scheduler reserves + HPA baseline; limits = hard cap (CPU throttle, mem OOMKill). HPA needs metrics-server + CPU requests.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code># metrics-server (kind needs the insecure-tls patch):
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch -n kube-system deploy metrics-server --type=json \
+  -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'</code></pre>
+    </div>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl top nodes ; kubectl top pods
+kubectl autoscale deploy/NAME --cpu-percent=50 --min=1 --max=5
+kubectl get hpa            # TARGETS = current%/target%</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Debugging loop (Module 10)</summary>
+    <p class="concept">Pending = scheduling (describe). CrashLoopBackOff = app (logs). ImagePullBackOff = image/registry (describe).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get pods [-o wide]                  # 1. state
+kubectl describe pod NAME                    # 2. EVENTS (the 'why')
+kubectl logs NAME [--previous] [-c CONT]     # 3. app output (crashed = --previous)
+kubectl get events --sort-by=.lastTimestamp  # 4. cluster timeline
+kubectl exec -it NAME -- sh                   # 5. inside a running container
+kubectl debug -it NAME --image=busybox --target=CONT   # no shell in image</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Health probes (Module 11)</summary>
+    <p class="concept">liveness = restart wedged container; readiness = gate traffic (Endpoints); startup = protect slow boot. Don't put dependency checks in liveness.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>startupProbe:   { httpGet: {path: /, port: 80}, failureThreshold: 30, periodSeconds: 2 }
+readinessProbe: { httpGet: {path: /, port: 80}, periodSeconds: 5, failureThreshold: 2 }
+livenessProbe:  { httpGet: {path: /, port: 80}, periodSeconds: 5, failureThreshold: 3 }
+# mechanisms: httpGet (2xx/3xx ok) | tcpSocket {port} | exec {command}</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Security &amp; RBAC (Module 12)</summary>
+    <p class="concept">Role (namespaced) + RoleBinding → subject. ClusterRole/Binding = cluster-wide. Least privilege; every pod runs as a ServiceAccount.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get ns
+kubectl config set-context --current --namespace=NS    # change default ns
+kubectl get sa,role,rolebinding -n NS
+kubectl auth can-i VERB RESOURCE -n NS                  # as you
+kubectl auth can-i delete pods --as=system:serviceaccount:NS:SA -n NS
+kubectl auth can-i --list --as=system:serviceaccount:NS:SA -n NS
+kubectl create role NAME --verb=get,list --resource=pods -n NS --dry-run=client -o yaml</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Observability (Module 13)</summary>
+    <p class="concept">Built-ins show CURRENT state only (top/events/logs are ephemeral). Production adds Prometheus (metrics history) + Grafana (dashboards) + Loki/ELK (logs).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl top nodes ; kubectl top pods [-A] [--sort-by=cpu]
+kubectl get events --sort-by=.lastTimestamp [-A]
+kubectl describe node NODE | grep -A8 "Allocated resources"
+kubectl get pods -A --field-selector=status.phase=Pending</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Capstone: multi-tier with Kustomize (Module 14)</summary>
+    <p class="concept">Combine: Namespace + Secret + ConfigMap + StatefulSet(DB) + Deployments + Services + probes + HPA. initContainer (`nc -z db 5432`) enforces start ordering.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl apply -k DIR/                  # deploy a whole app bundle
+kubectl delete -k DIR/                 # one-command teardown
+kubectl get all,pvc,cm,secret,hpa -n NS
+kubectl wait --for=condition=ready pod --all -n NS --timeout=180s
+kubectl port-forward -n NS svc/frontend 8080:80</code></pre>
+    </div>
+  </details>
 </main>
 <p id="no-results">No commands match your search.</p>
 <script>
