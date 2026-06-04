@@ -365,6 +365,72 @@ kubectl port-forward -n NS svc/frontend 8080:80</code></pre>
   document.getElementById("collapse-all").addEventListener("click", () => {
     allDetails().forEach(d => { d.open = false; });
   });
+
+  // Task 5: Live search with highlight and no-results state
+  const searchInput = document.getElementById("search");
+  const noResults = document.getElementById("no-results");
+
+  // Remember each module's open state before the first search, restore on clear.
+  let preSearchState = null;
+
+  function clearHighlights() {
+    document.querySelectorAll("#modules mark").forEach(m => {
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  }
+
+  function highlight(root, term) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const targets = [];
+    while (walker.nextNode()) {
+      if (walker.currentNode.nodeValue.toLowerCase().includes(term)) targets.push(walker.currentNode);
+    }
+    targets.forEach(node => {
+      const frag = document.createDocumentFragment();
+      const text = node.nodeValue;
+      const lower = text.toLowerCase();
+      let i = 0, idx;
+      while ((idx = lower.indexOf(term, i)) !== -1) {
+        if (idx > i) frag.appendChild(document.createTextNode(text.slice(i, idx)));
+        const mark = document.createElement("mark");
+        mark.textContent = text.slice(idx, idx + term.length);
+        frag.appendChild(mark);
+        i = idx + term.length;
+      }
+      if (i < text.length) frag.appendChild(document.createTextNode(text.slice(i)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+    const term = searchInput.value.trim().toLowerCase();
+    if (preSearchState === null && term !== "") {
+      preSearchState = [...allDetails()].map(d => d.open);
+    }
+    clearHighlights();
+
+    if (term === "") {
+      if (preSearchState) {
+        [...allDetails()].forEach((d, i) => { d.open = preSearchState[i]; d.hidden = false; });
+        preSearchState = null;
+      } else {
+        allDetails().forEach(d => { d.hidden = false; });
+      }
+      noResults.classList.remove("show");
+      return;
+    }
+
+    let anyMatch = false;
+    allDetails().forEach(d => {
+      const match = d.textContent.toLowerCase().includes(term);
+      d.hidden = !match;
+      d.open = match;
+      if (match) { highlight(d, term); anyMatch = true; }
+    });
+    noResults.classList.toggle("show", !anyMatch);
+  });
 </script>
 </body>
 </html>
