@@ -431,6 +431,30 @@ kubectl port-forward -n NS svc/frontend 8080:80</code></pre>
     });
     noResults.classList.toggle("show", !anyMatch);
   });
+
+  // Task 6: Theme toggle with persistence
+  const root = document.documentElement;
+  const themeBtn = document.getElementById("theme-toggle");
+
+  function applyTheme(theme) {
+    // theme: "dark" | "light" | null (null = follow OS)
+    if (theme) root.setAttribute("data-theme", theme);
+    else root.removeAttribute("data-theme");
+    const effectiveDark = theme
+      ? theme === "dark"
+      : !window.matchMedia("(prefers-color-scheme: light)").matches;
+    themeBtn.textContent = effectiveDark ? "☀️" : "🌙";
+  }
+
+  applyTheme(localStorage.getItem("cheatsheet-theme"));
+
+  themeBtn.addEventListener("click", () => {
+    const current = root.getAttribute("data-theme")
+      || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem("cheatsheet-theme", next);
+    applyTheme(next);
+  });
 </script>
 </body>
 </html>
