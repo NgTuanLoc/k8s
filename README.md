@@ -35,14 +35,14 @@ Each module is one markdown file. Work them **in order**. For every module:
 | 12 | Security & RBAC   | [12-security-rbac.md](12-security-rbac.md) | ✅ |
 | 13 | Observability     | [13-observability.md](13-observability.md) | ✅ |
 | 14 | Capstone          | [14-capstone.md](14-capstone.md) | ✅ |
-| 15 | Ingress           | [15-ingress.md](15-ingress.md) | ⬜ |
-| 16 | Helm              | [16-helm.md](16-helm.md) | ⬜ |
-| 17 | NetworkPolicy     | [17-network-policy.md](17-network-policy.md) | ⬜ |
-| 18 | Scheduling        | [18-scheduling.md](18-scheduling.md) | ⬜ |
-| 19 | Guardrails        | [19-guardrails.md](19-guardrails.md) | ⬜ |
-| 20 | GitOps (Argo CD)  | [20-gitops.md](20-gitops.md) | ⬜ |
+| 15 | Ingress           | [15-ingress.md](15-ingress.md) | ✅ |
+| 16 | Helm              | [16-helm.md](16-helm.md) | ✅ |
+| 17 | NetworkPolicy     | [17-network-policy.md](17-network-policy.md) | ✅ |
+| 18 | Scheduling        | [18-scheduling.md](18-scheduling.md) | ✅ |
+| 19 | Guardrails        | [19-guardrails.md](19-guardrails.md) | ✅ |
+| 20 | GitOps (Argo CD)  | [20-gitops.md](20-gitops.md) | ✅ |
 
-Legend: ⬜ not started · 🔧 in progress · ✅ done
+Legend: ⬜ not started · 🔧 in progress · ✅ available
 
 ## Resources
 
