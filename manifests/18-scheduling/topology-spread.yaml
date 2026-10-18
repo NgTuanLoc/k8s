@@ -1,0 +1,26 @@
+# SOFT-ish alternative: keep pods evenly spread across nodes (max difference
+# of 1), but still schedule all of them. 4 replicas over 2 workers -> 2 + 2.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: even
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: even
+  template:
+    metadata:
+      labels:
+        app: even
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: even
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10

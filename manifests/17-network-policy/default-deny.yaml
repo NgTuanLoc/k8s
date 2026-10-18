@@ -1,0 +1,10 @@
+# Empty podSelector = EVERY pod in the namespace. Listing Ingress with no
+# ingress rules = no inbound traffic allowed. Baseline for "deny by default".
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: netpol-lab
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]

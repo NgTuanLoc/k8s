@@ -220,4 +220,71 @@ kubectl port-forward -n NS svc/frontend 8080:80
 
 Combine: Namespace + Secret + ConfigMap + StatefulSet(DB) + Deployments + Services + probes + HPA. initContainer (`nc -z db 5432`) enforces start ordering.
 
+## Ingress (Module 15)
+
+```bash
+kubectl get ingressclass ; kubectl get ingress ; kubectl describe ingress NAME
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80 8443:443
+curl --resolve HOST:8080:127.0.0.1 http://HOST:8080/PATH
+kubectl create secret tls NAME --cert=tls.crt --key=tls.key
+```
+
+Ingress = rule; controller (ingress-nginx, Traefik…) = the proxy. Routes by Host + path (most specific wins). 404 = no rule matched; 503 = backend has no ready endpoints. Canary: 2nd Ingress with `nginx.ingress.kubernetes.io/canary: "true"` + `canary-weight`. Successor: Gateway API (HTTPRoute).
+
+## Helm (Module 16)
+
+```bash
+helm repo add NAME URL && helm repo update ; helm search repo X
+helm show values CHART ; helm template REL CHART -f values.yaml
+helm upgrade --install REL CHART -n NS --create-namespace -f values.yaml
+helm list -A ; helm history REL -n NS ; helm rollback REL N -n NS
+helm get values REL -n NS ; helm uninstall REL -n NS
+```
+
+Chart = templates + values; release = one install; each upgrade = a revision. Priority: chart values < -f files < --set. Pass -f on EVERY upgrade. Helm for third-party apps, Kustomize for your own.
+
+## NetworkPolicy (Module 17)
+
+```bash
+kubectl get netpol -n NS ; kubectl describe netpol NAME -n NS
+kubectl run t --rm -i --restart=Never -n NS --image=curlimages/curl --labels=app=X -- -s -m 3 http://SVC
+```
+
+Unselected pods = open. Selected = deny except allowed (policies OR together, allow-only). `ports` = container port. podSelector is same-namespace only; namespaceSelector+podSelector in ONE item = AND. Egress deny → allow DNS (UDP+TCP 53 to kube-dns). Needs an enforcing CNI (kind ≥ v0.24).
+
+## Scheduling (Module 18)
+
+```bash
+kubectl get pods -o wide ; kubectl get nodes --show-labels
+kubectl label node N key=val ; kubectl label node N key-
+kubectl taint node N key=val:NoSchedule ; kubectl taint node N key=val:NoSchedule-
+kubectl get events --field-selector reason=FailedScheduling
+kubectl get ds
+```
+
+Filter (requests, selectors, taints, affinity) → score. nodeSelector/nodeAffinity attract; taints repel, tolerations permit (not attract). Spread replicas: topologySpreadConstraints (soft) or podAntiAffinity (hard). DaemonSet = one pod per eligible node.
+
+## Guardrails: quota, limits, PDB (Module 19)
+
+```bash
+kubectl describe quota -n NS ; kubectl describe limitrange -n NS
+kubectl get events -n NS --field-selector reason=FailedCreate
+kubectl get pdb -n NS                     # ALLOWED DISRUPTIONS
+kubectl drain NODE --ignore-daemonsets --delete-emptydir-data ; kubectl uncordon NODE
+```
+
+ResourceQuota = namespace total; LimitRange = per-container defaults/max. Quota on requests → pods must declare them (LimitRange defaults fix it). Rejections show on the ReplicaSet. PDB gates evictions (drain), not crashes; ALLOWED 0 = stuck drain.
+
+## GitOps with Argo CD (Module 20)
+
+```bash
+kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+kubectl port-forward -n argocd svc/argocd-server 8443:443
+kubectl get applications -n argocd
+kubectl -n argocd annotate application NAME argocd.argoproj.io/refresh=normal --overwrite
+```
+
+Git = desired state; Argo pulls & applies. Sync (matches git?) ≠ Health (works?). selfHeal reverts manual edits; prune deletes what left git. Deploy = merge; rollback = git revert.
+
 <!-- More sections appended as modules are completed. -->

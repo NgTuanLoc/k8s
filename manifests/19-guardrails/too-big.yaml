@@ -1,0 +1,15 @@
+# Asks for more CPU than the LimitRange max (500m) -> rejected at admission.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: too-big
+  namespace: team-a
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        requests:
+          cpu: "1"
+        limits:
+          cpu: "1"

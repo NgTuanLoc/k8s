@@ -1,0 +1,26 @@
+# Tells Argo CD: keep namespace gitops-demo matching manifests/20-gitops/app on
+# the main branch of this repo. automated + selfHeal = fix drift on its own;
+# prune = delete objects that were removed from git.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops-demo
+  namespace: argocd
+  # Deleting the Application also deletes the resources it created.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/NgTuanLoc/k8s.git
+    targetRevision: main
+    path: manifests/20-gitops/app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,6 @@
+# A "team" namespace that gets guardrails: a quota (team budget) and a
+# LimitRange (per-container defaults and caps).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a

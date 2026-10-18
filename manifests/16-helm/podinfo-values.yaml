@@ -1,0 +1,12 @@
+# Our overrides for the public podinfo chart. Everything not listed here keeps
+# the chart's default (see: helm show values podinfo/podinfo).
+replicaCount: 2
+ui:
+  message: "Deployed with Helm"
+  color: "#2b6cb0"
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 64Mi

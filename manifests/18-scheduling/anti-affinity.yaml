@@ -1,0 +1,26 @@
+# HARD rule: never put two `spread` pods on the same node (topologyKey =
+# hostname). 3 replicas, 2 schedulable workers -> the 3rd pod stays Pending.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spread
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spread
+  template:
+    metadata:
+      labels:
+        app: spread
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app: spread
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10

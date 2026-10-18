@@ -1,0 +1,20 @@
+# Only schedule on nodes labelled disktype=ssd (we label one worker in the lab).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: needs-ssd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: needs-ssd
+  template:
+    metadata:
+      labels:
+        app: needs-ssd
+    spec:
+      nodeSelector:
+        disktype: ssd
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10

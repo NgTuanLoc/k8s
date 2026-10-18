@@ -1,0 +1,31 @@
+# One pod per node: the pattern for log shippers, node exporters, CNI agents.
+# `operator: Exists` with no key tolerates EVERY taint, so it also runs on the
+# control plane and the tainted gpu worker.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+spec:
+  selector:
+    matchLabels:
+      app: node-agent
+  template:
+    metadata:
+      labels:
+        app: node-agent
+    spec:
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: agent
+          image: busybox:1.36
+          command: ["sh", "-c", "echo agent on $NODE_NAME; sleep infinity"]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi

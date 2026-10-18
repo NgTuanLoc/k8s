@@ -325,6 +325,78 @@ kubectl wait --for=condition=ready pod --all -n NS --timeout=180s
 kubectl port-forward -n NS svc/frontend 8080:80</code></pre>
     </div>
   </details>
+  <details open>
+    <summary>Ingress (Module 15)</summary>
+    <p class="concept">Ingress = rule; controller (ingress-nginx, Traefik…) = the proxy. Routes by Host + path (most specific wins). 404 = no rule matched; 503 = backend has no ready endpoints. Canary: 2nd Ingress with `nginx.ingress.kubernetes.io/canary: "true"` + `canary-weight`. Successor: Gateway API (HTTPRoute).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get ingressclass ; kubectl get ingress ; kubectl describe ingress NAME
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80 8443:443
+curl --resolve HOST:8080:127.0.0.1 http://HOST:8080/PATH
+kubectl create secret tls NAME --cert=tls.crt --key=tls.key</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Helm (Module 16)</summary>
+    <p class="concept">Chart = templates + values; release = one install; each upgrade = a revision. Priority: chart values &lt; -f files &lt; --set. Pass -f on EVERY upgrade. Helm for third-party apps, Kustomize for your own.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>helm repo add NAME URL &amp;&amp; helm repo update ; helm search repo X
+helm show values CHART ; helm template REL CHART -f values.yaml
+helm upgrade --install REL CHART -n NS --create-namespace -f values.yaml
+helm list -A ; helm history REL -n NS ; helm rollback REL N -n NS
+helm get values REL -n NS ; helm uninstall REL -n NS</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>NetworkPolicy (Module 17)</summary>
+    <p class="concept">Unselected pods = open. Selected = deny except allowed (policies OR together, allow-only). `ports` = container port. podSelector is same-namespace only; namespaceSelector+podSelector in ONE item = AND. Egress deny → allow DNS (UDP+TCP 53 to kube-dns). Needs an enforcing CNI (kind ≥ v0.24).</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get netpol -n NS ; kubectl describe netpol NAME -n NS
+kubectl run t --rm -i --restart=Never -n NS --image=curlimages/curl --labels=app=X -- -s -m 3 http://SVC</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Scheduling (Module 18)</summary>
+    <p class="concept">Filter (requests, selectors, taints, affinity) → score. nodeSelector/nodeAffinity attract; taints repel, tolerations permit (not attract). Spread replicas: topologySpreadConstraints (soft) or podAntiAffinity (hard). DaemonSet = one pod per eligible node.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl get pods -o wide ; kubectl get nodes --show-labels
+kubectl label node N key=val ; kubectl label node N key-
+kubectl taint node N key=val:NoSchedule ; kubectl taint node N key=val:NoSchedule-
+kubectl get events --field-selector reason=FailedScheduling
+kubectl get ds</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>Guardrails: quota, limits, PDB (Module 19)</summary>
+    <p class="concept">ResourceQuota = namespace total; LimitRange = per-container defaults/max. Quota on requests → pods must declare them (LimitRange defaults fix it). Rejections show on the ReplicaSet. PDB gates evictions (drain), not crashes; ALLOWED 0 = stuck drain.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl describe quota -n NS ; kubectl describe limitrange -n NS
+kubectl get events -n NS --field-selector reason=FailedCreate
+kubectl get pdb -n NS                     # ALLOWED DISRUPTIONS
+kubectl drain NODE --ignore-daemonsets --delete-emptydir-data ; kubectl uncordon NODE</code></pre>
+    </div>
+  </details>
+
+  <details open>
+    <summary>GitOps with Argo CD (Module 20)</summary>
+    <p class="concept">Git = desired state; Argo pulls &amp; applies. Sync (matches git?) ≠ Health (works?). selfHeal reverts manual edits; prune deletes what left git. Deploy = merge; rollback = git revert.</p>
+    <div class="block">
+      <button class="copy-btn" type="button">Copy</button>
+      <pre><code>kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+kubectl port-forward -n argocd svc/argocd-server 8443:443
+kubectl get applications -n argocd
+kubectl -n argocd annotate application NAME argocd.argoproj.io/refresh=normal --overwrite</code></pre>
+    </div>
+  </details>
 </main>
 <p id="no-results">No commands match your search.</p>
 <script>

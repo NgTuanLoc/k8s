@@ -1,0 +1,27 @@
+# The lab taints one worker with dedicated=gpu:NoSchedule. This pod TOLERATES
+# that taint (allowed there) AND selects the node's label (sent there).
+# A toleration alone only permits; it doesn't attract.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-job
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gpu-job
+  template:
+    metadata:
+      labels:
+        app: gpu-job
+    spec:
+      nodeSelector:
+        dedicated: gpu
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10

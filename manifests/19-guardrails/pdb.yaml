@@ -1,0 +1,12 @@
+# Voluntary disruptions (drain, cluster upgrades) may never leave fewer than 2
+# ready `web` pods. Does NOT protect against crashes or node failure.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-pdb
+  namespace: team-a
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: web

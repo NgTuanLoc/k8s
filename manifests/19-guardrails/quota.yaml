@@ -1,0 +1,15 @@
+# Team budget: totals across ALL pods in team-a. Once a resource is quota'd,
+# every new pod MUST declare it (the LimitRange below fills defaults for that).
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-a-quota
+  namespace: team-a
+spec:
+  hard:
+    pods: "6"
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    services.nodeports: "0"
